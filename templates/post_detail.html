@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block content %}
+  <article class="post">
+    <div class="vote-section">
+      <form method="post" action="{{ url_for('vote_post', post_id=post.id, direction='up') }}" style="margin: 0;">
+        <button class="vote" title="Upvote" type="submit">▲</button>
+      </form>
+      <div class="score">{{ post.score }}</div>
+      <form method="post" action="{{ url_for('vote_post', post_id=post.id, direction='down') }}" style="margin: 0;">
+        <button class="vote" title="Downvote" type="submit">▼</button>
+      </form>
+    </div>
+    <div class="content">
+      <h1 class="title">{{ post.title }}</h1>
+      <div class="meta">
+        <a href="{{ url_for('view_subreddit', name=post.subreddit.name) }}">r/{{ post.subreddit.name }}</a>
+        <span>•</span>
+        <span>{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+      </div>
+      {% if post.body %}
+        <div class="post-body">
+          {{ post.body|nl2br }}
+        </div>
+      {% endif %}
+    </div>
+  </article>
+
+  <section class="comments">
+    <h3>Comments</h3>
+    {% if current_user.is_authenticated %}
+      <form method="post" class="comment-form">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+          {{ form.body.label }}
+          {{ form.body(rows=4, placeholder="What are your thoughts?") }}
+        </div>
+        {{ form.submit(class_='btn') }}
+      </form>
+    {% else %}
+      <div class="login-prompt">
+        <p>Please <a href="{{ url_for('login') }}">log in</a> to comment.</p>
+      </div>
+    {% endif %}
+
+    <div class="comments-list">
+      {% for c in post.comments|sort(attribute='created_at') %}
+        <div class="comment">
+          <div class="vote-section">
+            <form method="post" action="{{ url_for('vote_comment', comment_id=c.id, direction='up') }}" style="margin: 0;">
+              <button class="vote" title="Upvote" type="submit">▲</button>
+            </form>
+            <div class="score">{{ c.score }}</div>
+            <form method="post" action="{{ url_for('vote_comment', comment_id=c.id, direction='down') }}" style="margin: 0;">
+              <button class="vote" title="Downvote" type="submit">▼</button>
+            </form>
+          </div>
+          <div class="comment-content">
+            <div class="body">{{ c.body }}</div>
+            <div class="meta">{{ c.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+          </div>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color: var(--text-muted);">
+            <path d="M21.99 4c0-1.1-.89-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+          </svg>
+          <h4>No comments yet</h4>
+          <p>Be the first to share your thoughts!</p>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

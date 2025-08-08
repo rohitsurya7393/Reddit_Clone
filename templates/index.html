@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="toolbar">
+    <div class="sort-buttons">
+      <a class="btn {% if sort == 'hot' %}btn-secondary{% endif %}" href="{{ url_for('home', sort='hot') }}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+        Hot
+      </a>
+      <a class="btn {% if sort == 'new' %}btn-secondary{% endif %}" href="{{ url_for('home', sort='new') }}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+        </svg>
+        New
+      </a>
+    </div>
+    {% if subreddit %}
+      <div class="subreddit-info">
+        <h2>r/{{ subreddit.name }}</h2>
+        <p>{{ subreddit.description }}</p>
+      </div>
+    {% endif %}
+  </div>
+
+  {% for p in posts %}
+    <article class="post">
+      <div class="vote-section">
+        <form method="post" action="{{ url_for('vote_post', post_id=p.id, direction='up') }}" style="margin: 0;">
+          <button class="vote" title="Upvote" type="submit">▲</button>
+        </form>
+        <div class="score">{{ p.score }}</div>
+        <form method="post" action="{{ url_for('vote_post', post_id=p.id, direction='down') }}" style="margin: 0;">
+          <button class="vote" title="Downvote" type="submit">▼</button>
+        </form>
+      </div>
+      <div class="content">
+        <a class="title" href="{{ url_for('post_detail', post_id=p.id) }}">{{ p.title }}</a>
+        <div class="meta">
+          <a href="{{ url_for('view_subreddit', name=p.subreddit.name) }}">r/{{ p.subreddit.name }}</a>
+          <span>•</span>
+          <span>{{ p.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+        </div>
+        {% if p.body %}
+          <p>{{ p.body[:200] }}{% if p.body|length > 200 %}...{% endif %}</p>
+        {% endif %}
+      </div>
+    </article>
+  {% else %}
+    <div class="empty-state">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor" style="color: var(--text-muted);">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
+        <path d="M7 12h2v5H7zm4-3h2v8h-2zm4-3h2v11h-2z"/>
+      </svg>
+      <h3>No posts yet</h3>
+      <p>Be the first to create a post in this community!</p>
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('create_post') }}" class="btn">Create Post</a>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="btn">Login to Post</a>
+      {% endif %}
+    </div>
+  {% endfor %}
+{% endblock %}

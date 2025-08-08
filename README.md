@@ -5,11 +5,11 @@ A tiny Reddit-style app with users, subreddits, posts, comments, and voting.
 
 ### Home Page
 ![Home Page](images/home.png)
-*Modern, clean home page with posts, voting system, and navigation*
+*Professional, clean home page with posts, voting system, and navigation*
 
 ### Login Page
 ![Login Page](images/login.png)
-*User-friendly login interface with modern styling*
+*User-friendly login interface 
 
 ## Quickstart
 ```bash
